@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /VendorStoreAppBackend/Startup.cs
 /.editorconfig
+/VendorStoreAppBackend/Startup.cs
