@@ -19,7 +19,7 @@ namespace VendorStoreAppBackend.Entities_Models
         public string? VendorEmail { get; set; }
 
         [Required]
-        [StringLength(10)] // Adjust the length according to your needs
+        [StringLength(10)] // Adjust the length according 
         public string? VendorNumber { get; set; } 
 
         [Required]

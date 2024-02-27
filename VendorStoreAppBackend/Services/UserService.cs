@@ -1,4 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using VendorStoreAppBackend.Data;
 using VendorStoreAppBackend.Entities_Models;
 
@@ -21,8 +25,11 @@ namespace VendorStoreAppBackend.Services
         }
 
         // Create new user:
-        public async Task<Users> CreateUserAsync(Users user)
+        public async Task<Users> CreateUserAsync(Users user, string password)
         {
+            // Hash the password before storing it
+            user.UsersPasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
@@ -48,6 +55,35 @@ namespace VendorStoreAppBackend.Services
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return user;
+        }
+
+        // Authenticate user and generate JWT token
+        public async Task<string?> AuthenticateAndGetTokenAsync(string email, string password)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UsersEmail == email);
+
+            // Check if the user exists and the password is correct
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.UsersPasswordHash))
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes("YourSecretKey"); // Replace with secret key
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                        new(ClaimTypes.Name, user.UsersId.ToString())
+                        // You can add more claims as needed, such as roles, etc.
+                    }),
+                    Expires = DateTime.UtcNow.AddHours(1), // Token expiration time
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+                };
+
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return tokenHandler.WriteToken(token);
+            }
+
+            return null; // Authentication failed
         }
     }
 }
