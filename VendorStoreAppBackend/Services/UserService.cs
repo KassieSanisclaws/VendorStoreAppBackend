@@ -8,19 +8,19 @@ namespace VendorStoreAppBackend.Services
     {
         private readonly VendorStoreAppContext _context = context;
 
-        // Get all users
+        // Get all users:
         public async Task<List<Users>> GetAllUsersAsync()
         {
             return await _context.Users.ToListAsync();
         }
 
-        // Get user by id
+        // Get user by id:
         public async Task<Users?> GetUserByIdAsync(int id)
         {
             return await _context.Users.FindAsync(id);
         }
 
-        // Create new user
+        // Create new user:
         public async Task<Users> CreateUserAsync(Users user)
         {
             _context.Users.Add(user);
@@ -28,7 +28,7 @@ namespace VendorStoreAppBackend.Services
             return user;
         }
 
-        // Update user by id
+        // Update user by id:
         public async Task<Users> UpdateUserAsync(int id, Users user)
         {
             var existingUser = await _context.Users.FindAsync(id) ?? throw new ArgumentException("User not found");
@@ -40,14 +40,10 @@ namespace VendorStoreAppBackend.Services
             return existingUser;
         }
 
-        // Delete user by id
+        // Delete user by id:
         public async Task<Users> DeleteUserAsync(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                throw new ArgumentException("User not found");
-            }
+            var user = await _context.Users.FindAsync(id) ?? throw new ArgumentException("User not found");
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();

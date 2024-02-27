@@ -42,7 +42,7 @@ namespace VendorStoreAppBackend.Controllers
         {
             if (id != user.UsersId)
             {
-                return BadRequest();
+                return BadRequest("User Update UnSuccessful!");
             }
             await _userService.UpdateUserAsync(id, user);
             return NoContent();
