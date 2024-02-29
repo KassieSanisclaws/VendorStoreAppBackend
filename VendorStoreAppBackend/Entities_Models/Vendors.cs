@@ -36,7 +36,7 @@ namespace VendorStoreAppBackend.Entities_Models
 
         [Required]
         [StringLength(400)] // Adjust the length according to your needs
-        public string? VendorPassword { get; set; }
+        public string? VendorPasswordHash { get; set; }
 
         [Required]
         [StringLength(400)] // Adjust the length according to your needs

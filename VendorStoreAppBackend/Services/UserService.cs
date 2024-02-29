@@ -28,7 +28,7 @@ namespace VendorStoreAppBackend.Services
         public async Task<Users> CreateUserAsync(Users user, string password)
         {
             // Hash the password before storing it
-            user.UsersPasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+            user.UsersPasswordHash = BCrypt.Net.BCrypt.HashPassword(user.UsersPasswordHash);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -67,16 +67,15 @@ namespace VendorStoreAppBackend.Services
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes("YourSecretKey"); // Replace with secret key
-
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
-                    Subject = new ClaimsIdentity(new Claim[]
+                    Subject = new ClaimsIdentity(new Claim[]    
                     {
                         new(ClaimTypes.Name, user.UsersId.ToString())
                         // You can add more claims as needed, such as roles, etc.
                     }),
-                    Expires = DateTime.UtcNow.AddHours(1), // Token expiration time
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+                    Expires = DateTime.UtcNow.AddHours(4), // Token expiration time
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature) //Hashing Algorithm strength 
                 };
 
                 var token = tokenHandler.CreateToken(tokenDescriptor);
