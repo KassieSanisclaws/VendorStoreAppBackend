@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using VendorStoreAppBackend.Entities_Models;
 using VendorStoreAppBackend.Services;
 
@@ -69,10 +70,33 @@ namespace VendorStoreAppBackend.Controllers
             return NoContent();
         }
 
+        //TOKEN [REFRESH]: api/users/refresh-token
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<TokenResponse>> RefreshToken([FromBody] TokenResponse request)
+        {
+            var result = _userService.RefreshAccessTokenAsync(request.RefreshToken ?? "Invalid Token");
+            if (result == null)
+            {
+                return BadRequest(new { message = "Invalid token" });
+            }
+            return Ok(result);
+        }
+
+        //REFRESH TOKEN RESPONSE: api/users/refresh-token
+        public class TokenResponse
+        {
+            [Required]
+            public string? AccessToken { get; set; }
+            [Required]
+            public string? RefreshToken { get; set; }
+        }
+
+       //USER CREATION [REQUEST]: api/users/create
         public class CreateUserRequest
         {
             public Users? User { get; set; }
             public string? Password { get; set; }
+            public string? UserName { get; set; }
         }
 
     }

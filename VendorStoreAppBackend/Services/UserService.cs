@@ -58,13 +58,33 @@ namespace VendorStoreAppBackend.Services
         }
 
         // Authenticate user and generate JWT token
-        public async Task<string?> AuthenticateAndGetTokenAsync(string email, string password)
+        public async Task<TokenResponse?> AuthenticateAndGetTokenAsync(string email, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UsersEmail == email);
 
             // Check if the user exists and the password is correct
             if (user != null && BCrypt.Net.BCrypt.Verify(password, user.UsersPasswordHash))
             {
+
+                var accessToken = GenerateAccessToken(user);
+                var refreshToken = GenerateRefreshToken();
+
+                // Store refresh token in the database
+                user.RefreshToken = refreshToken;
+                await _context.SaveChangesAsync();
+
+                return new TokenResponse
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
+            }
+            return null; // Authentication failed
+        }
+
+          //GENERATE ACCESS TOKEN: api/users/authenticate
+          private static string GenerateAccessToken(Users user)
+          { 
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes("YourSecretKey"); // Replace with secret key
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -82,7 +102,36 @@ namespace VendorStoreAppBackend.Services
                 return tokenHandler.WriteToken(token);
             }
 
-            return null; // Authentication failed
+            //Generaterefresh token
+            private static string GenerateRefreshToken()
+            {
+                var refreshToken = Guid.NewGuid().ToString();
+                return refreshToken;
+            }
+
+        // Refresh access token using refresh token
+        public async Task<TokenResponse?> RefreshAccessTokenAsync(string refreshToken)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+            if (user != null)
+            {
+                var accessToken = GenerateAccessToken(user);
+                return new TokenResponse
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                };
+            }
+
+            return null; // Invalid refresh token
         }
+    }
+
+    // Response class for returning access and refresh tokens
+    public class TokenResponse
+    {
+        public string? AccessToken { get; set; }
+        public string? RefreshToken { get; set; }
+
     }
 }
