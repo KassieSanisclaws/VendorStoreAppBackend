@@ -43,6 +43,9 @@ namespace VendorStoreAppBackend.Entities_Models
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime AdminUpdatedAt { get; set; } = DateTime.UtcNow;
+
+        //Navigation
+        public ICollection<User_Roles>? UserRoles { get; set; }
     }
 }
 

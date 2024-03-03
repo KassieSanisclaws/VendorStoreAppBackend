@@ -56,5 +56,11 @@ namespace VendorStoreAppBackend.Entities_Models
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime VendorUpdatedAt { get; set; } = default;
+
+        public string? AccessToken { get; set; }
+        public string? RefreshToken { get; set; }
+
+        // Navigation
+        public ICollection<User_Roles>? UserRoles { get; set; }
     }
 }

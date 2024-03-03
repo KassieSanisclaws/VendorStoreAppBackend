@@ -57,16 +57,39 @@ namespace VendorStoreAppBackend.Services
                 return vendor;
             }
 
-            //Authenticate vendor and generate JWT token
-            public async Task<string?> AuthenticateVendorAsync(string vendorName, string vendorPassword)
+        //Authenticate vendor and generate JWT token
+        public async Task<string?> AuthenticateVendorAsync(string vendorName, string vendorPassword)
+        {
+            var vendor = await _context.Vendors.SingleOrDefaultAsync(x => x.VendorName == vendorName);
+
+            if (vendor == null || !BCrypt.Net.BCrypt.Verify(vendorPassword, vendor.VendorPasswordHash))
             {
-                var vendor = await _context.Vendors.SingleOrDefaultAsync(x => x.VendorName == vendorName);
+                return null;
+            }
+            return GenerateJwtToken(vendor);
+        }
 
-                if (vendor == null || !BCrypt.Net.BCrypt.Verify(vendorPassword, vendor.VendorPasswordHash))
-                {
-                    return null;
-                }
+        //REFRESH TOKEN
+        public async Task<string?> RefreshTokenAsync(string? refreshToken)
+        {
+            if(string.IsNullOrEmpty(refreshToken))
+            {
+               return null;
+            }
 
+          var vendor = await _context.Vendors.SingleOrDefaultAsync(x => x.RefreshToken == refreshToken);
+             
+            if(vendor == null)
+            {
+               return null;
+            }
+
+            return GenerateJwtToken(vendor);
+        }
+
+        //Generate JWT token
+            private static string GenerateJwtToken(Vendors vendor) 
+            { 
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes("suPerRsecretKeyAsExamplE579433");
                 var tokenDescriptor = new SecurityTokenDescriptor
@@ -75,14 +98,19 @@ namespace VendorStoreAppBackend.Services
                      //Performs check first for null value before assigning
                      {
                      new(ClaimTypes.Name, value: vendor.VendorName ?? "Vendor Not Found"),
-                     new(ClaimTypes.Role, "Vendor")
+                     new(ClaimTypes.Role, "Vendor"),
+                     new(JwtRegisteredClaimNames.Email, vendor.VendorEmail ?? "Vendor Email Not Found"),
+                     new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString() ?? "Jti Not Found"),
+                     new(JwtRegisteredClaimNames.Sub, vendor.VendorEmail ?? "Vendor Email Not Found")
                      }),
                     Expires = DateTime.UtcNow.AddHours(4), //Hours before expriation of token
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature) //Hash Algorithm strength
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
-                return tokenHandler.WriteToken(token);
+                 
+            return  tokenHandler.WriteToken(token);
+                
             }
 
-        }
+      }
 }

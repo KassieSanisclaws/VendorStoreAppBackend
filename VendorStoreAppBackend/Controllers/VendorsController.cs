@@ -90,8 +90,28 @@ namespace VendorStoreAppBackend.Controllers
            }
 
 
+        //TOKEN [REFRESH]: api/vendors/refresh-token
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<RefrshToknResp>> RefreshToken([FromBody] RefrshToknResp request)
+        {
+            var result = _vendorService.RefreshTokenAsync(request.RefreshToken);
+            if (result == null)
+            {
+                return BadRequest(new { message = "Invalid token" });
+            }
+            return Ok(result);
+        }
 
+        //REFRESH TOKEN RESPONSE: api/vendors/refresh-token
+        public class RefrshToknResp
+        {
+            [Required]
+            public string? AccessToken { get; set; }
+            [Required]
+            public string? RefreshToken { get; set; }
+        }
 
+        //VENDOR CREATION [REQUEST]: api/vendors/create
         public class VendorCreationRequest
         {
             [Required]

@@ -55,6 +55,10 @@ namespace VendorStoreAppBackend.Entities_Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UsersUpdatedAt { get; set; } = DateTime.UtcNow;
 
+        public string? AccessToken { get; set; }
+
+        public string? RefreshToken { get; set; }
+
         // Navigation property
         public ICollection<User_Roles>? UserRoles { get; set; }
     }
