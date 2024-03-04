@@ -23,11 +23,15 @@ namespace VendorStoreAppBackend.Entities_Models
         public string? AdminEmail { get; set; }
 
         [Required]
+        [Phone]
+         public string? PhoneNumber { get; set; }
+
+        [Required]
         [StringLength(400)] // Adjust the length according to your needs
         public string? AdminPasswordHash { get; set; }
 
         [Required]
-        public Gender AdminGender { get; set; }
+        public Gender Gender { get; set; }
 
         [StringLength(500)]
         public string AdminImg { get; set; } = string.Empty;
@@ -43,6 +47,10 @@ namespace VendorStoreAppBackend.Entities_Models
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime AdminUpdatedAt { get; set; } = DateTime.UtcNow;
+
+        public string? AccessToken { get; set; }
+
+        public string? RefreshToken { get; set; }
 
         //Navigation
         public ICollection<User_Roles>? UserRoles { get; set; }

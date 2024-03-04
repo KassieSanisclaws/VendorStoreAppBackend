@@ -47,7 +47,7 @@ namespace VendorStoreAppBackend.Controllers
                 VendorName = request.VendorName,
                 VendorEmail = request.VendorEmail,
                 VendorNumber = request.VendorNumber,
-                VendorAddress = request.VendorAddress,
+                Address = request.VendorAddress,
                 VendorBussRegID = request.VendorBussRegID,
                 VendorBussLicense = request.VendorBussLicense,
                 VendorPasswordHash = request.VendorPasswordHash,
@@ -92,7 +92,7 @@ namespace VendorStoreAppBackend.Controllers
 
         //TOKEN [REFRESH]: api/vendors/refresh-token
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<RefrshToknResp>> RefreshToken([FromBody] RefrshToknResp request)
+        public ActionResult<RefrshToknResp> RefreshToken([FromBody] RefrshToknResp request)
         {
             var result = _vendorService.RefreshTokenAsync(request.RefreshToken);
             if (result == null)

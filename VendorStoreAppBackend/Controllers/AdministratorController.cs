@@ -32,7 +32,7 @@ namespace VendorStoreAppBackend.Controllers
             return Ok(administrator);
         }
 
-        // POST [CREATE NEW ADMINISTRATOR]: api/vendors
+        // POST [CREATE NEW ADMINISTRATOR]: api/administrators
         [HttpPost]
         [Authorize(Roles = "Admin")] // Only Admin can access this endpoint
         public async Task<ActionResult> CreateNewAdministrator([FromBody] AdministratorCreationRequest request)
@@ -44,12 +44,12 @@ namespace VendorStoreAppBackend.Controllers
 
             var administrator = new Administrators
             {
-                AdminName = request.AdminName,
+                AdminFirstName = request.AdminFirstName ?? "Admin Not Found",
+                AdminLastName = request.AdminLastName ?? "Admin Not Found",
                 AdminEmail = request.AdminEmail,
-                AdminNumber = request.AdminNumber,
-                AdminAddress = request.AdminAddress,
+                PhoneNumber = request.PhoneNumber,
                 AdminPasswordHash = request.AdminPasswordHash,
-                AdminImg = request.AdminImg
+                AdminImg = request.AdminImg ?? "Admin Not Found",
             };
 
             try
@@ -65,7 +65,7 @@ namespace VendorStoreAppBackend.Controllers
 
         }
 
-        // PUT [UPDATE VENDOR]: api/administrators/5 (for example)
+        // PUT [UPDATE ADMIN]: api/administrators/5 (for example)
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> UpdateAdminsitratorID(int id, Administrators administrator)
@@ -78,19 +78,19 @@ namespace VendorStoreAppBackend.Controllers
             return NoContent();
         }
 
-        // DELETE [VENDOR]: api/administrator/5 (for example)
+        // DELETE [ADMIN]: api/administrator/5 (for example)
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")] // Only Admin can access this endpoint
         public async Task<ActionResult> DeleteAdmin(int id)
         {
-            await _administratorService.DeleteAdminsitratorAsync(id);
+            await _administratorService.DeleteAdministratorAsync(id);
             return NoContent();
         }
 
 
-        //TOKEN [REFRESH]: api/vendors/refresh-token
+        //TOKEN [REFRESH]: api/admionistrator/refresh-token
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<RefrshToknResp>> RefreshToken([FromBody] RefrshToknResp request)
+        public ActionResult<RefrshToknResp> RefreshToken([FromBody] RefrshToknResp request)
         {
             var result = _administratorService.RefreshTokenAsync(request.RefreshToken);
             if (result == null)
@@ -100,7 +100,7 @@ namespace VendorStoreAppBackend.Controllers
             return Ok(result);
         }
 
-        //REFRESH TOKEN RESPONSE: api/vendors/refresh-token
+        //REFRESH TOKEN RESPONSE: api/administrators/refresh-token
         public class RefrshToknResp
         {
             [Required]
@@ -109,44 +109,36 @@ namespace VendorStoreAppBackend.Controllers
             public string? RefreshToken { get; set; }
         }
 
-        //VENDOR CREATION [REQUEST]: api/vendors/create
+        //ADMIN CREATION [REQUEST]: api/administrator/create
         public class AdministratorCreationRequest
         {
             [Required]
             [StringLength(120)]
-            public string? VendorName { get; set; }
+            public string? AdminFirstName { get; set; }
+
+            [Required]
+            [StringLength(120)]
+            public string? AdminLastName { get; set; }
 
             [Required]
             [StringLength(120)]
             [EmailAddress]
-            public string? VendorEmail { get; set; }
+            public string? AdminEmail { get; set; }
 
             [Required]
-            [StringLength(10)]
-            public string? VendorNumber { get; set; }
-
-            [Required]
-            [StringLength(120)]
-            public string? VendorAddress { get; set; }
-
-            [Required]
-            [StringLength(120)]
-            public string? VendorBussRegID { get; set; }
-
-            [Required]
-            [StringLength(120)]
-            public string? VendorBussLicense { get; set; }
+            [Phone]
+            public string? PhoneNumber { get; set; }
 
             [Required]
             [StringLength(400)]
-            public string? VendorPasswordHash { get; set; }
+            public string? AdminPasswordHash { get; set; }
 
             [Required]
             [StringLength(400)]
-            public string? VendorImg { get; set; }
+            public string? AdminImg { get; set; }
 
             [StringLength(255)]
-            public string? VendorGreetingsIntro { get; set; }
+            public string? AdminGreetingsIntro { get; set; }
         }
 
 

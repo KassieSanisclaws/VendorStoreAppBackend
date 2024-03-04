@@ -19,12 +19,16 @@ namespace VendorStoreAppBackend.Entities_Models
         public string? VendorEmail { get; set; }
 
         [Required]
+        [Phone]
+        public string? PhoneNumber { get; set; }
+
+        [Required]
         [StringLength(10)] // Adjust the length according 
         public string? VendorNumber { get; set; } 
 
         [Required]
         [StringLength(120)]
-        public string? VendorAddress { get; set; } = string.Empty;
+        public string? Address { get; set; } = string.Empty;
 
         [Required]
         [StringLength(120)]

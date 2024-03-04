@@ -24,19 +24,19 @@ namespace VendorStoreAppBackend.Services
             return await _context.Administrators.FindAsync(id);
         }
 
-        // Update vendor by id:
-        public async Task<Vendors> UpdateAdminstratorAsync(int id, Administrators administrator)
+        // Update Administrator by id:
+        public async Task<Administrators> UpdateAdministratorAsync(int id, Administrators administrator)
         {
-            var existingVendor = await _context.Vendors.FindAsync(id) ?? throw new ArgumentException("Administrator not found");
-            existingVendor.VendorName = vendor.VendorName;
-            existingVendor.VendorEmail = vendor.VendorEmail;
-            existingVendor.VendorId = vendor.VendorId;
-            existingVendor.VendorBussRegID = vendor.VendorBussRegID;
-            //existingVendor.
+            var existingAdmin = await _context.Administrators.FindAsync(id) ?? throw new ArgumentException("Administrator not found");
+            existingAdmin.AdminFirstName = administrator.AdminFirstName;
+            existingAdmin.AdminLastName = administrator.AdminLastName;
+            existingAdmin.AdminEmail = administrator.AdminEmail;
+            existingAdmin.AdminId = administrator.AdminId;
+            //existingAdmin.
             // Update other properties as needed...
 
             await _context.SaveChangesAsync();
-            return existingVendor;
+            return existingAdmin;
         }
 
         // Delete vendor by id:
@@ -75,7 +75,7 @@ namespace VendorStoreAppBackend.Services
                 return null;
             }
 
-            var administrator = await _context.Vendors.SingleOrDefaultAsync(x => x.RefreshToken == refreshToken);
+            var administrator = await _context.Administrators.SingleOrDefaultAsync(x => x.RefreshToken == refreshToken);
 
             if (administrator == null)
             {
@@ -86,7 +86,7 @@ namespace VendorStoreAppBackend.Services
         }
 
         //Generate JWT token
-        private static string GenerateJwtToken(Vendors vendor)
+        private static string GenerateJwtToken(Administrators administrators)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("suPerRsecretKeyAsExamplE579433");
@@ -95,11 +95,11 @@ namespace VendorStoreAppBackend.Services
                 Subject = new ClaimsIdentity(new Claim[]
                  //Performs check first for null value before assigning
                  {
-                     new(ClaimTypes.Name, value: vendor.VendorName ?? "Vendor Not Found"),
-                     new(ClaimTypes.Role, "Vendor"),
-                     new(JwtRegisteredClaimNames.Email, vendor.VendorEmail ?? "Vendor Email Not Found"),
+                     new(ClaimTypes.Name, value: administrators.AdminFirstName ?? "Vendor Not Found"),
+                     new(ClaimTypes.Role, "Admin"),
+                     new(JwtRegisteredClaimNames.Email, administrators.AdminEmail ?? "Vendor Email Not Found"),
                      new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString() ?? "Jti Not Found"),
-                     new(JwtRegisteredClaimNames.Sub, vendor.VendorEmail ?? "Vendor Email Not Found")
+                     new(JwtRegisteredClaimNames.Sub, administrators.AdminEmail ?? "Vendor Email Not Found")
                  }),
                 Expires = DateTime.UtcNow.AddHours(4), //Hours before expriation of token
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature) //Hash Algorithm strength

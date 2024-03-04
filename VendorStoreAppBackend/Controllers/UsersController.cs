@@ -72,7 +72,7 @@ namespace VendorStoreAppBackend.Controllers
 
         //TOKEN [REFRESH]: api/users/refresh-token
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<TokenResponse>> RefreshToken([FromBody] TokenResponse request)
+        public ActionResult<TokenResponse> RefreshToken([FromBody] TokenResponse request)
         {
             var result = _userService.RefreshAccessTokenAsync(request.RefreshToken ?? "Invalid Token");
             if (result == null)

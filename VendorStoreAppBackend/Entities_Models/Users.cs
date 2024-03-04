@@ -28,8 +28,8 @@ namespace VendorStoreAppBackend.Entities_Models
         public string? UsersPasswordHash { get; set; }
 
         [Required]
-        [StringLength(10)] // Adjust the length according to your needs
-        public string? UsersMobile { get; set; }
+        [Phone]
+        public string? PhoneNumber { get; set; }
 
         [Required]
         public Gender UsersGender { get; set; }
